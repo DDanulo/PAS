@@ -1,25 +1,27 @@
 package com.example.service;
 
 import com.example.domain.Client;
+import com.example.mappers.UserMapper;
+import com.example.model.ShowUserDTO;
 import com.example.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
+@Service
 public class ClientService {
 
+    private final UserMapper userMapper;
     private final UserRepository repository;
     private final EntityManager em;
     private final EntityTransaction transaction;
 
-    public ClientService(EntityManager em, EntityTransaction transaction) {
-        repository = new UserRepository();
-        this.em = em;
-        this.transaction = transaction;
-    }
 
     public void registerUser(Client client) {
         transaction.begin();
@@ -31,8 +33,8 @@ public class ClientService {
         return repository.findById(id, em);
     }
 
-    public List<Client> getAllUsers() {
-        return repository.findAll(em);
+    public List<ShowUserDTO> getAllUsers() {
+        return repository.findAll(em).stream().map(userMapper::roomToShowRoomDTO).toList();
     }
 
     public void removeUser(UUID id) {

@@ -3,12 +3,18 @@ package com.example.repository;
 import com.example.domain.Client;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
+import org.springframework.stereotype.Repository;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public class UserRepository implements Repository<Client> {
+@Repository
+public class UserRepository implements IRepository<Client> {
+
+    public Client findByLogin;
+
     @Override
     public void add(Client obj, EntityManager em) {
         em.persist(obj);
@@ -23,8 +29,8 @@ public class UserRepository implements Repository<Client> {
     }
 
     @Override
-    public Client findById(UUID obj, EntityManager em) {
-        return em.find(Client.class, obj);
+    public Optional<Client> findById(UUID obj, EntityManager em) {
+        return Optional.ofNullable(em.find(Client.class, obj));
     }
 
     @Override

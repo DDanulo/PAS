@@ -6,9 +6,10 @@ import jakarta.persistence.LockModeType;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public class RoomRepository implements Repository<Room> {
+public class RoomRepository implements IRepository<Room> {
     @Override
     public void add(Room obj, EntityManager em) {
         em.persist(obj);
@@ -23,8 +24,8 @@ public class RoomRepository implements Repository<Room> {
     }
 
     @Override
-    public Room findById(UUID obj, EntityManager em) {
-        return em.find(Room.class, obj);
+    public Optional<Room> findById(UUID obj, EntityManager em) {
+        return Optional.ofNullable(em.find(Room.class, obj));
     }
 
     @Override

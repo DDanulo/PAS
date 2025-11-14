@@ -20,19 +20,14 @@ public class TrainerClient extends Client {
     @Column(name = "is_partner")
     private Boolean isPartner;
 
-    public TrainerClient(String firstName, String lastName, String email, Boolean isPartner) {
-        super(firstName, lastName, email);
+    public TrainerClient(String login, String firstName, String lastName, String email, Boolean isPartner) {
+        super(login, true, firstName, lastName, email);
         this.isPartner = isPartner;
     }
 
     @Override
     public double getDiscount() {
         return isPartner ? 0.5 : 0.1;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "TrainerUser";
     }
 
     @Override

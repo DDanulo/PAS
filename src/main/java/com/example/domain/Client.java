@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,6 +18,12 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Client extends User {
 
+    public Client(String login, Boolean isActive, String firstName, String lastName, String email) {
+        super(login, isActive);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
 
     @NotNull
     @Column(name = "first_name", length = 64)
@@ -41,15 +48,8 @@ public abstract class Client extends User {
     @UpdateTimestamp
     private LocalDateTime dateUpdated;
 
-    public Client(String firstName, String lastName, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }
 
     public abstract double getDiscount();
-
-    public abstract String getTypeName();
 
     @Override
     public String toString() {

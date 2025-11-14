@@ -3,11 +3,14 @@ package com.example.repository;
 import com.example.domain.Reservation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public class ReservationRepository implements Repository<Reservation> {
+@Repository
+public class ReservationRepository implements IRepository<Reservation> {
     @Override
     public void add(Reservation obj, EntityManager em) {
         em.persist(obj);
@@ -22,7 +25,7 @@ public class ReservationRepository implements Repository<Reservation> {
     }
 
     @Override
-    public Reservation findById(UUID obj, EntityManager em) {
+    public Optional<Reservation> findById(UUID obj, EntityManager em) {
         return em.find(Reservation.class, obj);
     }
 

@@ -4,23 +4,20 @@ import com.example.domain.Reservation;
 import com.example.repository.ReservationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
+@Service
 public class ReservationService {
 
     private final ReservationRepository repository;
     private final EntityManager em;
     private final EntityTransaction transaction;
-
-
-    public ReservationService(EntityManager em, EntityTransaction transaction) {
-        repository = new ReservationRepository();
-        this.em = em;
-        this.transaction = transaction;
-    }
 
     public void makeReservation(Reservation res) {
         try {

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
@@ -20,25 +22,19 @@ public class RegularClient extends Client {
     @Min(0)
     private Integer loyaltyCounter;
 
-    public RegularClient(String firstName, String lastName, String email) {
-        super(firstName, lastName, email);
-        this.loyaltyCounter = 0;
-    }
-
-    public RegularClient(String firstName, String lastName, String email, Integer loyaltyCounter) {
-        super(firstName, lastName, email);
+    public RegularClient(UUID userId, String login, Boolean isActive, String firstName, String lastName, String email, Integer loyaltyCounter) {
+        super(login, isActive, firstName, lastName, email);
         this.loyaltyCounter = loyaltyCounter;
+    }
+    public RegularClient(String login, String firstName, String lastName, String email) {
+        super(login, true, firstName, lastName, email);
+        this.loyaltyCounter = 0;
     }
 
     @Override
     public double getDiscount() {
         double discount = loyaltyCounter * 0.01;
         return loyaltyCounter <= 20 ? discount : 0.2;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "RegularUser";
     }
 
     public void incrementLoyalty() {

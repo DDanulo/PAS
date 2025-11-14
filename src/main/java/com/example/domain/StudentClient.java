@@ -15,18 +15,13 @@ import lombok.Setter;
 @DiscriminatorValue(value = "student_user")
 public class StudentClient extends Client {
 
-    public StudentClient(String firstName, String lastName, String email) {
-        super(firstName, lastName, email);
+    public StudentClient(String login, String firstName, String lastName, String email) {
+        super(login, true, firstName, lastName, email);
     }
 
     @Override
     public double getDiscount() {
         return 0.25;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "StudentUser";
     }
 
 }
