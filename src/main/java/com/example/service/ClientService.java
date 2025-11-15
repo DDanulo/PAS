@@ -28,14 +28,14 @@ public class ClientService {
         repository.add(client, em);
         transaction.commit();
     }
-
+/*
     public Client findUsers(UUID id) {
         return repository.findById(id, em);
     }
 
     public List<ShowUserDTO> getAllUsers() {
         return repository.findAll(em).stream().map(userMapper::roomToShowRoomDTO).toList();
-    }
+    } */
 
     public void removeUser(UUID id) {
         transaction.begin();

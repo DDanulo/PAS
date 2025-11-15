@@ -1,7 +1,5 @@
 package com.example.controller;
 
-import com.example.domain.Client;
-import com.example.model.ShowRoomDTO;
 import com.example.model.ShowUserDTO;
 import com.example.service.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,8 @@ public class ClientController {
 
     @GetMapping
     public List<ShowUserDTO> getAllRooms(){
-        return clientService.getAllUsers();
+       // return clientService.getAllUsers();
+        return null;
     }
 
 }

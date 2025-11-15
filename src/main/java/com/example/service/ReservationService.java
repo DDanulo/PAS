@@ -53,10 +53,10 @@ public class ReservationService {
         repository.removeById(id, em);
         transaction.commit();
     }
-
+/*
     public Reservation findReservation(UUID id) {
         return repository.findById(id, em);
-    }
+    } */
 
     public List<Reservation> getAllReservations() {
         return repository.findAll(em);

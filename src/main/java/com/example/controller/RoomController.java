@@ -25,7 +25,8 @@ public class RoomController {
 
     @GetMapping("/{id}")
     public ShowRoomDTO getRoomById(@PathVariable UUID id){
-        return (roomService.findRoom(id).orElseThrow(NotFoundException::new));
+        //return (roomService.findRoom(id).orElseThrow(NotFoundException::new));
+        return null;
     }
 
     @GetMapping

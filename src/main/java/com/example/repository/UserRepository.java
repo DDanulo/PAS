@@ -28,14 +28,14 @@ public class UserRepository implements IRepository<Client> {
         }
     }
 
-    @Override
+    /*@Override
     public Optional<Client> findById(UUID obj, EntityManager em) {
         return Optional.ofNullable(em.find(Client.class, obj));
-    }
+    } */
 
     @Override
     public List<Client> findAll(EntityManager em) {
-        return em.createQuery("SELECT u FROM Client u", Client.class).getResultList();
+        return null;
     }
 
     @Override

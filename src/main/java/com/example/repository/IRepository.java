@@ -11,7 +11,7 @@ public interface IRepository<T> {
 
     void removeById(UUID obj, EntityManager em);
 
-    Optional<T> findById(UUID obj, EntityManager em);
+   // Optional<T> findById(UUID obj, EntityManager em);
 
     List<T> findAll(EntityManager em);
 

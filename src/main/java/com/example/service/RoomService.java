@@ -32,10 +32,10 @@ public class RoomService {
         repository.removeById(id, em);
         transaction.commit();
     }
-
+/*
     public Optional<ShowRoomDTO> findRoom(UUID id) {
         return Optional.ofNullable(roomMapper.roomToShowRoomDTO(repository.findById(id, em).orElse(null)));
-    }
+    } */
 
     public List<ShowRoomDTO> getAllRooms() {
         return repository.findAll(em).stream().map(roomMapper::roomToShowRoomDTO).toList();

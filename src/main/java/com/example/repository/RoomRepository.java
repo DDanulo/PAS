@@ -23,14 +23,14 @@ public class RoomRepository implements IRepository<Room> {
         }
     }
 
-    @Override
+    /*@Override
     public Optional<Room> findById(UUID obj, EntityManager em) {
         return Optional.ofNullable(em.find(Room.class, obj));
-    }
+    } */
 
     @Override
     public List<Room> findAll(EntityManager em) {
-        return em.createQuery("SELECT r FROM Room r", Room.class).getResultList();
+        return null;
     }
 
     @Override

@@ -1,23 +1,19 @@
 package com.example.domain;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
-@Entity
 @NoArgsConstructor
-@Table(name = "Rooms")
 public class Room {
 
     public Room(RoomType roomType, Integer capacity, Double basePrice) {
@@ -25,33 +21,21 @@ public class Room {
         this.capacity = capacity;
         this.basePrice = basePrice;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID roomId;
-
-    @Version
-    @Getter(AccessLevel.PRIVATE)
-    @Setter(AccessLevel.PRIVATE)
-    private int version;
-
-    @CreationTimestamp
-    private LocalDateTime dateCreated;
-    @UpdateTimestamp
-    private LocalDateTime dateUpdated;
-
+    @NotNull
+    @BsonId
+    private ObjectId roomId;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
+    @BsonProperty("room_type")
     private RoomType roomType;
 
     @NotNull
-    @Column(name = "capacity")
-    @Min(0)
+    @Min(1)
+    @BsonProperty("capacity")
     private Integer capacity;
 
     @NotNull
-    @Column(name = "base_price")
     @DecimalMin("0.0")
+    @BsonProperty("base_price")
     private Double basePrice;
 }

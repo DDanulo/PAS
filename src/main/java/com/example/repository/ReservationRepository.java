@@ -24,14 +24,14 @@ public class ReservationRepository implements IRepository<Reservation> {
         }
     }
 
-    @Override
-    public Optional<Reservation> findById(UUID obj, EntityManager em) {
+    /*@Override
+    public Optional<Reservation> findById(UUID obj) {
         return em.find(Reservation.class, obj);
-    }
+    }*/
 
     @Override
     public List<Reservation> findAll(EntityManager em) {
-        return em.createQuery("SELECT r FROM Reservation r", Reservation.class).getResultList();
+        return null;
     }
 
     @Override

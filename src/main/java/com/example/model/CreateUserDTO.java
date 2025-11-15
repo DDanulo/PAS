@@ -1,6 +1,5 @@
 package com.example.model;
 
-import com.example.mappers.UserTypes;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -22,8 +21,4 @@ public class CreateUserDTO {
 
     @NotNull
     private String email;
-
-    private UserTypes userTypes;
-
-    private Boolean isTrainerPartner;
 }
