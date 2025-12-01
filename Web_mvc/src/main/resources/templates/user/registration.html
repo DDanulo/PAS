@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rejestracja Klienta</title>
+</head>
+<body>
+
+<h1>Rejestracja nowego klienta</h1>
+
+<div th:if="${serverError}" th:text="${serverError}" style="color: red; font-weight: bold;"></div>
+
+<form th:action="@{/register}" th:object="${client}" method="post">
+
+    <div>
+        <label>Login:</label>
+        <input type="text" th:field="*{login}" />
+        <p th:if="${#fields.hasErrors('login')}" th:errors="*{login}" style="color: red;"></p>
+    </div>
+
+    <div>
+        <label>Imię:</label>
+        <input type="text" th:field="*{firstName}" />
+        <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" style="color: red;"></p>
+    </div>
+
+    <div>
+        <label>Nazwisko:</label>
+        <input type="text" th:field="*{lastName}" />
+        <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color: red;"></p>
+    </div>
+
+    <div>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" />
+        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red;"></p>
+    </div>
+
+    <input type="hidden" th:field="*{isActive}" />
+
+    <div>
+        <button type="submit">Zarejestruj</button>
+    </div>
+
+</form>
+
+</body>
+</html>

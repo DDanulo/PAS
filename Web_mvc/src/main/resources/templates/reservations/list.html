@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Moje Rezerwacje</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            text-decoration: none;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Lista rezerwacji</h1>
+
+<a th:href="@{/reservations/add}" class="btn btn-add">
+    + Dodaj nową rezerwację
+</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>Pokój / Sala (ID)</th>
+        <th>Początek</th>
+        <th>Koniec</th>
+        <th>Cena</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="res : ${reservations}">
+        <td th:text="${res.roomId}">ID Pokoju</td>
+        <td th:text="${#temporals.format(res.startTime, 'dd-MM-yyyy HH:mm')}">Start</td>
+        <td th:text="${#temporals.format(res.endTime, 'dd-MM-yyyy HH:mm')}">Koniec</td>
+        <td th:text="${res.price} + ' PLN'">Cena</td>
+        <td>
+            <form th:action="@{/reservations/end/{id}(id=${res.reservationId})}" method="post">
+                <button type="submit" class="btn btn-delete">Zakończ</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/reservations/delete/{id}(id=${res.reservationId})}" method="post"
+                  onsubmit="return confirm('Czy na pewno chcesz usunąć tę rezerwację?');">
+                <button type="submit" class="btn btn-delete">Usuń</button>
+            </form>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(reservations)}">
+        <td colspan="5" style="text-align: center;">Brak aktywnych rezerwacji.</td>
+    </tr>
+    </tbody>
+</table>
+<br/>
+</body>
+</html>
