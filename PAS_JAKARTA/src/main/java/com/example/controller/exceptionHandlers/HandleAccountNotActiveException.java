@@ -1,4 +1,4 @@
-package com.example.controller;
+package com.example.controller.exceptionHandlers;
 
 import com.example.controller.exception.AccountNotActiveException;
 import jakarta.ws.rs.core.Response;

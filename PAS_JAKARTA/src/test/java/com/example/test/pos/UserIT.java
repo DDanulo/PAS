@@ -10,7 +10,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-class UserITtest {
+class UserIT {
 
     @BeforeAll
     static void setup() {
@@ -210,7 +210,7 @@ class UserITtest {
     @Test
     void testSameLoginCreate() {
         String login = "test" + UUID.randomUUID().toString().substring(0, 8);
-        ;
+
         String email = login + "@example.com";
 
         String body = """
@@ -236,7 +236,7 @@ class UserITtest {
                 .when()
                 .post("/client")
                 .then()
-                .statusCode(500);
+                .statusCode(409);
 
     }
 }

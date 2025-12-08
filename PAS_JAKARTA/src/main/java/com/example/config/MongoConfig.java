@@ -6,7 +6,11 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.context.Dependent;
@@ -58,5 +62,19 @@ public class MongoConfig {
     @ApplicationScoped
     public MongoDatabase rentAFieldDB(MongoClient mongoClient) {
         return mongoClient.getDatabase("rentafield");
+    }
+
+    @PostConstruct
+    public void ensureIndexesAndDrop() {
+        MongoCollection<User> users = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("users", User.class);
+        users.drop();
+        MongoCollection<Reservation> reservations = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("reservations", Reservation.class);
+        reservations.drop();
+        MongoCollection<Room> rooms = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("rooms", Room.class);
+        rooms.drop();
+        users.createIndex(
+                Indexes.ascending("login"),
+                new IndexOptions().unique(true).name("uk_users_login")
+        );
     }
 }

@@ -1,11 +1,14 @@
 package com.example.service;
 
+import com.example.controller.exception.NotFoundException;
+import com.example.controller.exception.SameLoginException;
 import com.example.mappers.UserMapper;
 import com.example.model.users.CreateAdminDTO;
 import com.example.model.users.CreateClientDTO;
 import com.example.model.users.CreateModeratorDTO;
 import com.example.model.users.ShowUserDTO;
 import com.example.repository.UserRepository;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -41,9 +44,9 @@ public class UserServiceMongo implements UserService {
             try {
                 repository.add(session, userMapper.toClient(user));
                 session.commitTransaction();
-            } catch (Exception e) {
+            } catch (MongoWriteException e) {
                 session.abortTransaction();
-                throw new RuntimeException("Cannot add Client", e);
+                throw new SameLoginException("Cannot add Client", e);
             }
         }
     }
@@ -58,9 +61,9 @@ public class UserServiceMongo implements UserService {
             try {
                 repository.add(session, userMapper.toAdmin(user));
                 session.commitTransaction();
-            } catch (Exception e) {
+            } catch (MongoWriteException e) {
                 session.abortTransaction();
-                throw new RuntimeException("Cannot add Admin", e);
+                throw new SameLoginException("Cannot add Client", e);
             }
         }
     }
@@ -75,9 +78,9 @@ public class UserServiceMongo implements UserService {
             try {
                 repository.add(session, userMapper.toModerator(user));
                 session.commitTransaction();
-            } catch (Exception e) {
+            } catch (MongoWriteException e) {
                 session.abortTransaction();
-                throw new RuntimeException("Cannot add Moderator", e);
+                throw new SameLoginException("Cannot add Client", e);
             }
         }
     }
@@ -95,20 +98,17 @@ public class UserServiceMongo implements UserService {
     @Override
     public void updateClient(String id, CreateClientDTO Client) {
         ObjectId objectId = new ObjectId(id);
-        if (objectId == null) {
-            throw new IllegalArgumentException("Wrong Client id");
-        }
         if (findUser(id).isEmpty()) {
-            throw new IllegalArgumentException("Client not found");
+            throw new NotFoundException("Client not found");
         }
         try (ClientSession session = mongoClientProvider.get().startSession()) {
             session.startTransaction();
             try {
                 repository.update(session, objectId, userMapper.toClient(Client));
                 session.commitTransaction();
-            } catch (Exception e) {
+            }  catch (MongoWriteException e) {
                 session.abortTransaction();
-                throw new RuntimeException("Cannot update Client", e);
+                throw new SameLoginException("Cannot add Client", e);
             }
         }
     }

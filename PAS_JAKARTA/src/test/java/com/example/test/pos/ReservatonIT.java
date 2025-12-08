@@ -10,7 +10,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-public class ReservatonITtest {
+public class ReservatonIT {
     @BeforeAll
     static void setup() {
         RestAssured.baseURI = "http://localhost";
@@ -139,7 +139,7 @@ public class ReservatonITtest {
                 .when()
                 .post("/reservations")
                 .then()
-                .statusCode(500);
+                .statusCode(409);
     }
 
 }

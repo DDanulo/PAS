@@ -38,15 +38,10 @@ public class RoomServiceMongo implements RoomService {
             throw new IllegalArgumentException();
         }
         try (ClientSession session = mongoClientProvider.get().startSession()) {
-            session.startTransaction();
-            try {
+            return session.withTransaction(() -> {
                 Room room1 = repository.add(session, roomMapper.createRoomDTOToRoom(room));
-                session.commitTransaction();
                 return roomMapper.roomToShowRoomDTO(room1);
-            } catch (Exception e) {
-                session.abortTransaction();
-                throw new RuntimeException("Cannot add room", e);
-            }
+            });
         }
     }
 
@@ -62,47 +57,35 @@ public class RoomServiceMongo implements RoomService {
 
     @Override
     public void removeRoom(String id) {
-        ObjectId objectId = new ObjectId(id);
         if (id == null) {
-            throw new IllegalArgumentException("Wrong room id");
+            throw new NotFoundException("Wrong room id");
         }
+        if (findRoom(id).isEmpty()) {
+            throw new NotFoundException("Room not found");
+        }
+        ObjectId objectId = new ObjectId(id);
 
-        if (findRoom(id) == null) {
-            throw new IllegalArgumentException("Room not found");
-        }
         try (ClientSession session = mongoClientProvider.get().startSession()) {
-            session.startTransaction();
-            try {
+            session.withTransaction(() -> {
                 repository.remove(session, objectId);
-                session.commitTransaction();
-            } catch (Exception e) {
-                session.abortTransaction();
-                throw new RuntimeException("Cannot remove room", e);
-            }
+                return null;
+            });
         }
     }
 
     @Override
     public ShowRoomDTO updateRoom(String id, CreateRoomDTO room) {
-        ObjectId objectId = new ObjectId(id);
         if (findRoom(id).isEmpty()) {
             throw new NotFoundException("Room not found");
         }
+        ObjectId objectId = new ObjectId(id);
         Room toUpdate = roomMapper.createRoomDTOToRoom(room);
         toUpdate.setRoomId(objectId);
         try (ClientSession session = mongoClientProvider.get().startSession()) {
-            session.startTransaction();
-            Room updated;
-            try {
-                updated = repository.update(session, objectId, toUpdate);
-                session.commitTransaction();
-            } catch (MongoException ex) {
-                if (session.hasActiveTransaction()) {
-                    session.abortTransaction();
-                }
-                throw new RuntimeException("Cannot update room", ex);
-            }
-            return roomMapper.roomToShowRoomDTO(updated);
+            return session.withTransaction(() -> {
+                Room room1 = repository.update(session, objectId, toUpdate);
+                return roomMapper.roomToShowRoomDTO(room1);
+            });
         }
     }
 }

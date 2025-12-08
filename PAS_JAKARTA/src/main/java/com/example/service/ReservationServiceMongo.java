@@ -1,8 +1,6 @@
 package com.example.service;
 
-import com.example.controller.exception.AccountNotActiveException;
-import com.example.controller.exception.NotFoundException;
-import com.example.controller.exception.ReservationHasEndedException;
+import com.example.controller.exception.*;
 import com.example.domain.Client;
 import com.example.domain.Reservation;
 import com.example.mappers.ReservationMapper;
@@ -48,33 +46,31 @@ public class ReservationServiceMongo implements ReservationService {
     public void makeReservation(CreateReservationDTO reservation) {
         try (ClientSession session = mongoClientProvider.get().startSession()) {
             session.startTransaction();
-            try {
-                LocalDateTime start = reservation.getStartTime();
-                List<ShowReservationDTO> allReservations = getAllReservations();
 
-                for (ShowReservationDTO r : allReservations) {
-                    if (reservation.getRoomId().toString().equals(r.getRoomId()) && r.getEndTime() == null) {
-                        throw new Exception("W tym czasie istnieje już inna rezerwacja.");
-                    }
+            LocalDateTime start = reservation.getStartTime();
+            List<ShowReservationDTO> allReservations = getAllReservations();
+
+            for (ShowReservationDTO r : allReservations) {
+                if (reservation.getRoomId().equals(r.getRoomId()) && r.getEndTime() == null) {
+                    throw new RoomIsReservedException("W tym czasie istnieje już inna rezerwacja.");
                 }
-
-                if (!userRepository.findById(new ObjectId(reservation.getClientId()))
-                        .orElseThrow(NotFoundException::new).getIsActive()) {
-                    throw new AccountNotActiveException();
-                }
-                Reservation r = reservationMapper.createReservationDTOToReservation(reservation);
-                r.setClient((Client) userRepository.findById(new ObjectId(reservation.getClientId()))
-                        .orElseThrow(NotFoundException::new));
-                r.setRoom(roomRepository.findById(new ObjectId(reservation.getRoomId()))
-                        .orElseThrow(NotFoundException::new));
-
-                repository.add(session, r);
-
-                session.commitTransaction();
-            } catch (Exception e) {
-                session.abortTransaction();
-                throw new RuntimeException("Cannot add reservation", e);
             }
+
+            if (!userRepository.findById(new ObjectId(reservation.getClientId()))
+                    .orElseThrow(NotFoundException::new).getIsActive()) {
+                throw new AccountNotActiveException();
+            }
+
+            Reservation r = reservationMapper.createReservationDTOToReservation(reservation);
+            r.setClient((Client) userRepository.findById(new ObjectId(reservation.getClientId()))
+                    .orElseThrow(NotFoundException::new));
+            r.setRoom(roomRepository.findById(new ObjectId(reservation.getRoomId()))
+                    .orElseThrow(NotFoundException::new));
+
+            repository.add(session, r);
+
+            session.commitTransaction();
+
         }
     }
 
@@ -100,35 +96,27 @@ public class ReservationServiceMongo implements ReservationService {
             throw new ReservationHasEndedException();
         }
         try (ClientSession session = mongoClientProvider.get().startSession()) {
-            session.startTransaction();
-            try {
+            session.withTransaction(() -> {
                 repository.remove(session, objectId);
-                session.commitTransaction();
-            } catch (Exception e) {
-                session.abortTransaction();
-                throw new RuntimeException("Cannot remove reservation", e);
-            }
+                return null;
+            });
         }
     }
 
     @Override
     public void updateReservation(String id, CreateReservationDTO res) {
-        ObjectId objectId = new ObjectId(id);
         if (id == null) {
-            throw new IllegalArgumentException("Wrong reservation id");
+            throw new NotFoundException("Wrong reservation id");
         }
-        if (findReservation(id) == null) {
-            throw new IllegalArgumentException("Reservation not found");
+        if (findReservation(id).isEmpty()) {
+            throw new NotFoundException("Reservation not found");
         }
+        ObjectId objectId = new ObjectId(id);
         try (ClientSession session = mongoClientProvider.get().startSession()) {
-            session.startTransaction();
-            try {
+            session.withTransaction(() -> {
                 repository.update(session, objectId, reservationMapper.createReservationDTOToReservation(res));
-                session.commitTransaction();
-            } catch (Exception e) {
-                session.abortTransaction();
-                throw new RuntimeException("Cannot update reservation", e);
-            }
+                return null;
+            });
         }
     }
 
@@ -179,15 +167,14 @@ public class ReservationServiceMongo implements ReservationService {
         ObjectId objectId = new ObjectId(id);
         try (ClientSession session = mongoClientProvider.get().startSession()) {
             session.startTransaction();
-            try {
-                Reservation reservation = repository.findById(objectId).orElseThrow(NotFoundException::new);
-                reservation.setEndTime(LocalDateTime.now());
-                repository.update(session, objectId, reservation);
-                session.commitTransaction();
-            } catch (Exception e) {
+            Reservation reservation = repository.findById(objectId).orElseThrow(NotFoundException::new);
+            if (reservation.getEndTime() != null) {
                 session.abortTransaction();
-                throw new RuntimeException("Cannot update reservation", e);
+                throw new ReservationIsAlreadyEndedException();
             }
+            reservation.setEndTime(LocalDateTime.now());
+            repository.update(session, objectId, reservation);
+            session.commitTransaction();
         }
     }
 }
