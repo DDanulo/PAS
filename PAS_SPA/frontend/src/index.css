@@ -1,0 +1,66 @@
+:root {
+    background-color: white;
+}
+
+body {
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+nav {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    color: darkblue;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: lightgray;
+}
+
+.error {
+    color: red;
+    font-size: 0.8em;
+}
+
+.btn {
+    cursor: pointer;
+    padding: 5px 10px;
+    margin-right: 5px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+input, select {
+    padding: 5px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
