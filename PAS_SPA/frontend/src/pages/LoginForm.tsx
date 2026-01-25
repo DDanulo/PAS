@@ -4,8 +4,9 @@ import axios from 'axios';
 import {useAuth} from '../context/LoggedUserContext';
 
 const LoginForm = () => {
-    const {setToken} = useAuth();
+    const {setTokens} = useAuth();
     const navigate = useNavigate();
+
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -20,43 +21,59 @@ const LoginForm = () => {
                 password: password
             });
 
-            const token = response.data;
-            setToken(token);
+            const {accessToken, refreshToken} = response.data;
+
+            setTokens(accessToken, refreshToken);
+
             navigate('/users');
         } catch (err: any) {
-            console.error(err);
-            if (err.response && err.response.status === 401) {
-                setError("Błędny hasło lub login");
-            } else if (err.response && err.response.status === 403) {
-                setError("Konto nie jest aktywne w systemie.");
+            console.error("Login Error:", err);
+
+            if (err.response) {
+                switch (err.response.status) {
+                    case 401:
+                        setError("Błędne hasło lub login.");
+                        break;
+                    case 403:
+                        setError("Konto nie jest aktywne w systemie.");
+                        break;
+                    default:
+                        setError("Błąd serwera. Spróbuj ponownie później.");
+                }
             } else {
-                setError("Wystąpił nieoczekiwany błąd");
+                setError("Brak połączenia z serwerem.");
             }
         }
     };
 
     return (
         <div className="container">
-            <h2>Logowanie</h2>
-            {error && <div className="error-message">{error}</div>}
+            <div className="login-box">
+                <h2>Logowanie</h2>
+                {error && <div className="error-message" style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Login"
-                    value={login}
-                    onChange={e => setLogin(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Hasło"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Zaloguj</button>
-            </form>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            placeholder="Login"
+                            value={login}
+                            onChange={e => setLogin(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <input
+                            type="password"
+                            placeholder="Hasło"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="login-button">Zaloguj</button>
+                </form>
+            </div>
         </div>
     );
 };

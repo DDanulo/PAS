@@ -1,5 +1,4 @@
-import axios from "axios";
-import {createContext, useContext, useEffect, useMemo, useState, ReactNode} from "react";
+import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from "react";
 import {jwtDecode} from "jwt-decode";
 
 interface JwtPayload {
@@ -10,7 +9,8 @@ interface JwtPayload {
 
 interface AuthContextType {
     token: string | null;
-    setToken: (token: string | null) => void;
+    refreshToken: string | null;
+    setTokens: (accessToken: string | null, refreshToken: string | null) => void;
     userRole: string | null;
     userLogin: string | null;
     isAuthenticated: boolean;
@@ -20,61 +20,59 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({children}: { children: ReactNode }) => {
-    const [token, setToken_] = useState<string | null>(sessionStorage.getItem("jwt_token"));
+    const [token, setToken] = useState<string | null>(sessionStorage.getItem("jwt_token"));
+    const [refreshToken, setRefreshToken] = useState<string | null>(sessionStorage.getItem("refresh_token"));
     const [userRole, setUserRole] = useState<string | null>(null);
     const [userLogin, setUserLogin] = useState<string | null>(null);
 
-    const setToken = (newToken: string | null) => {
-        setToken_(newToken);
+    const setTokens = (accessToken: string | null, rToken: string | null) => {
+        if (accessToken) {
+            sessionStorage.setItem('jwt_token', accessToken);
+            setToken(accessToken);
+        }
+        if (rToken) {
+            sessionStorage.setItem('refresh_token', rToken);
+            setRefreshToken(rToken);
+        }
     };
 
     const logout = () => {
+        sessionStorage.clear();
         setToken(null);
+        setRefreshToken(null);
+        setUserRole(null);
+        setUserLogin(null);
     };
 
     useEffect(() => {
-        if (token) {
-            axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-            sessionStorage.setItem('jwt_token', token);
-
+        if (token && token !== "undefined" && token !== "null") {
             try {
                 const decoded = jwtDecode<JwtPayload>(token);
                 setUserRole(decoded.role);
                 setUserLogin(decoded.sub);
             } catch (e) {
-                setToken(null);
+                console.error("Błąd dekodowania JWT:", e);
+                logout();
             }
-
-        } else {
-            delete axios.defaults.headers.common["Authorization"];
-            sessionStorage.removeItem('jwt_token');
-            setUserRole(null);
-            setUserLogin(null);
         }
     }, [token]);
 
-    const contextValue = useMemo(
-        () => ({
-            token,
-            setToken,
-            userRole,
-            userLogin,
-            isAuthenticated: !!token,
-            logout,
-        }),
-        [token, userRole, userLogin]
-    );
+    const contextValue = useMemo(() => ({
+        token,
+        refreshToken,
+        setTokens,
+        userRole,
+        userLogin,
+        isAuthenticated: !!token,
+        logout,
+    }), [token, refreshToken, userRole, userLogin]);
 
-    return (
-        <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error;
-    }
+    if (!context) throw new Error("useAuth must be used within AuthProvider");
     return context;
 };
 

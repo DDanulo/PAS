@@ -22,19 +22,28 @@ public class JwtService {
     @Value("${security.jwt.expTime}")
     private long expirationTime;
 
+    @Value("${security.jwt.refreshExpTime}")
+    private long refreshExpirationTime;
+
     public String generateToken(String username, String role) {
         Map<String, Object> credentials = new HashMap<>();
         credentials.put("role", role);
-        return createToken(credentials, username);
+        return createToken(credentials, username, expirationTime);
     }
 
-    private String createToken(Map<String, Object> credentials, String subject) {
+    public String generateRefreshToken(String username, String role) {
+        Map<String, Object> credentials = new HashMap<>();
+        credentials.put("role", role);
 
+        return createToken(credentials, username, refreshExpirationTime);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long ttl) {
         return Jwts.builder()
-                .setClaims(credentials)
+                .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + (expirationTime * 1000)))
+                .setExpiration(new Date(System.currentTimeMillis() + (ttl * 1000)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
