@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 @NoArgsConstructor
 @BsonDiscriminator(key = "clazz", value = "admin")
 public class Admin extends User {
-    public Admin(ObjectId userId, String login, String firstName, String lastName, String email, Boolean isActive, Role role) {
-        super(userId, login, firstName, lastName, email, isActive, role);
+    public Admin(ObjectId userId, String login, String password, String firstName, String lastName, String email, Boolean isActive) {
+        super(userId, login, password, firstName, lastName, email, isActive, Role.ADMIN);
     }
 }

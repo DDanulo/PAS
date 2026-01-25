@@ -29,6 +29,11 @@ public abstract class User {
     private String login;
 
     @NotBlank
+    @Size(min = 8)
+    @BsonProperty("password")
+    private String password;
+
+    @NotBlank
     @Size(min = 3, max = 30)
     @BsonProperty("first_name")
     private String firstName;
@@ -48,13 +53,14 @@ public abstract class User {
     private Boolean isActive;
 
     @NotNull
-    @BsonProperty("_clazz")
+    @BsonProperty("role")
     private Role role;
 
-    public User(String login, String firstName, String lastName, String email) {
-        this.login = login;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }
+//    public User(String login, String firstName, String lastName, String email, String password) {
+//        this.login = login;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.email = email;
+//        this.password = password;
+//    }
 }

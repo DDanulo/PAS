@@ -11,7 +11,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +18,12 @@ import java.util.Optional;
 @Repository
 public class UserRepository extends AbstractMongoRepository implements IRepository<User> {
 
-    MongoCollection<User> users;
+    private final MongoCollection<User> users;
 
     public UserRepository(MongoClient mongoClient, MongoDatabase rentAFieldDB) {
         super(mongoClient, rentAFieldDB);
         users = getRentAFieldDB().getCollection("users", User.class);
     }
-
 
     @Override
     public void add(ClientSession session, User obj) {
@@ -33,16 +31,22 @@ public class UserRepository extends AbstractMongoRepository implements IReposito
     }
 
     @Override
-    public void remove(ClientSession session, ObjectId obj) {
-        Bson filter = Filters.eq("_id", obj);
-        users.deleteOne(session, filter);
+    public void remove(ClientSession session, ObjectId id) {
+        users.deleteOne(session, Filters.eq("_id", id));
     }
 
     @Override
     public Optional<User> findById(ObjectId id) {
-        Bson filter = Filters.eq("_id", id);
-        return Optional.ofNullable(users.find(filter).first());
+        return Optional.ofNullable(users.find(Filters.eq("_id", id)).first());
+    }
 
+    public Optional<User> findByLogin(String login) {
+        return Optional.ofNullable(users.find(Filters.eq("login", login)).first());
+    }
+
+    public List<User> searchByLogin(String login) {
+        Bson filter = Filters.regex("login", ".*" + login + ".*", "i");
+        return users.find(filter).into(new ArrayList<>());
     }
 
     @Override
@@ -52,37 +56,31 @@ public class UserRepository extends AbstractMongoRepository implements IReposito
 
     @Override
     public void update(ClientSession session, ObjectId id, User obj) {
-        Bson updateName = Updates.set("first_name", obj.getFirstName());
-        Bson updateLastName = Updates.set("last_name", obj.getLastName());
-        Bson updateEmail = Updates.set("email", obj.getEmail());
-        users.updateOne(session, Filters.eq("_id", id), Updates.combine(updateEmail, updateName, updateLastName));
-    }
+        List<Bson> updated = new ArrayList<>();
 
-    public void setActiveStatus(ClientSession session, ObjectId id) {
-        Bson updateStatus = Updates.set("is_active", true);
-        if (session == null) {
-            users.updateOne(Filters.eq("_id", id), updateStatus);
-        } else {
-            users.updateOne(session, Filters.eq("_id", id), updateStatus);
+        updated.add(Updates.set("login", obj.getLogin()));
+        updated.add(Updates.set("first_name", obj.getFirstName()));
+        updated.add(Updates.set("last_name", obj.getLastName()));
+        updated.add(Updates.set("email", obj.getEmail()));
+        updated.add(Updates.set("role", obj.getRole()));
+        updated.add(Updates.set("active", obj.getIsActive()));
+
+        if (obj.getPassword() != null) {
+            updated.add(Updates.set("password", obj.getPassword()));
         }
+
+        users.updateOne(session, Filters.eq("_id", id), Updates.combine(updated));
     }
 
-    public void setInactiveStatus(ClientSession session, ObjectId id) {
-        Bson updateStatus = Updates.set("is_active", false);
-        if (session == null) {
-            users.updateOne(Filters.eq("_id", id), updateStatus);
-        } else {
-            users.updateOne(session, Filters.eq("_id", id), updateStatus);
-        }
+    public void activateAccount(ClientSession session, ObjectId id) {
+        users.updateOne(session != null ? session : getMongoClient().startSession(),
+                Filters.eq("_id", id),
+                Updates.set("active", true));
     }
 
-    public Optional<User> findByLogin(String login) {
-        Bson filter = Filters.eq("login", login);
-        return Optional.ofNullable(users.find(filter).first());
-    }
-
-    public List<User> searchByLogin(String login) {
-        Bson filter = Filters.regex("login", ".*" + login + ".*");
-        return users.find(filter).into(new ArrayList<>());
+    public void deactivateAccount(ClientSession session, ObjectId id) {
+        users.updateOne(session != null ? session : getMongoClient().startSession(),
+                Filters.eq("_id", id),
+                Updates.set("active", false));
     }
 }

@@ -53,12 +53,12 @@ export default function ReservationList() {
     };
 
     const getClientName = (id: string) => {
-        const client = clients.find((c: any) => c.id === id || c.userId === id || c._id === id);
+        const client = clients.find((c: any) => c.id === id);
         return client ? `${client.firstName} ${client.lastName} (${client.login})` : id;
     };
 
     const getRoomName = (id: string) => {
-        const room = rooms.find((r: any) => r.id === id || r.roomId === id || r._id === id);
+        const room = rooms.find((r: any) => r.id === id);
         return room ? `${room.roomType} (Cena: ${room.basePrice})` : id;
     };
 
@@ -81,7 +81,7 @@ export default function ReservationList() {
                 </thead>
                 <tbody>
                 {reservations.map((res: any) => {
-                    const currentId = res.id || res._id || res.reservationId;
+                    const currentId = res.reservationId;
 
                     return (
                         <tr key={currentId}>

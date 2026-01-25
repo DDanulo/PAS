@@ -3,22 +3,14 @@ package com.example.model.users;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
-public class CreateAdminDTO {
-
-    @NotNull
-    @Size(min = 5, max = 20)
-    private String login;
-
-    @NotNull
-    @Size(min = 8)
-    private String password;
+public class UpdateUserDTO {
 
     @NotNull
     @Size(min = 3, max = 30)
@@ -32,7 +24,4 @@ public class CreateAdminDTO {
     @Email
     @Size(min = 3, max = 50)
     private String email;
-
-    @NotNull
-    private Boolean isActive;
 }
