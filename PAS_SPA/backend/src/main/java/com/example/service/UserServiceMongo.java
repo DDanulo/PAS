@@ -1,6 +1,7 @@
 package com.example.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.example.controller.exception.SameLoginException;
 import com.example.domain.Admin;
 import com.example.domain.Client;
 import com.example.domain.Moderator;
@@ -30,7 +31,7 @@ public class UserServiceMongo implements UserService {
     public void registerClient(CreateClientDTO dto) {
         if (dto == null) throw new IllegalArgumentException("DTO cannot be null");
         if (repository.findByLogin(dto.getLogin()).isPresent()) {
-            throw new IllegalArgumentException("Login zajęty");
+            throw new SameLoginException("Login zajęty");
         }
         try (ClientSession session = mongoClient.startSession()) {
             session.startTransaction();

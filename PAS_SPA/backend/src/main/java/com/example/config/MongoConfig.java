@@ -71,7 +71,7 @@ public class MongoConfig {
         MongoCollection<Reservation> reservations = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("reservations", Reservation.class);
         reservations.drop();
         MongoCollection<Room> rooms = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("rooms", Room.class);
-        rooms.drop();
+//        rooms.drop();
         users.createIndex(
                 Indexes.ascending("login"),
                 new IndexOptions().unique(true).name("uk_users_login")
