@@ -1,9 +1,8 @@
 package com.example.service;
 
-import com.example.model.users.CreateAdminDTO;
-import com.example.model.users.CreateClientDTO;
-import com.example.model.users.CreateModeratorDTO;
-import com.example.model.users.ShowUserDTO;
+import com.example.domain.User;
+import com.example.model.ChangePasswordDTO;
+import com.example.model.users.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +18,7 @@ public interface UserService {
 
     List<ShowUserDTO> getAllUsers();
 
-    void updateClient(String id, CreateClientDTO Client);
+    void updateClient(String id, UpdateUserDTO dto);
 
     Optional<ShowUserDTO> getClientByLogin(String login);
 
@@ -28,4 +27,8 @@ public interface UserService {
     void activateClient(String id);
 
     void deactivateClient(String id);
+
+    User findByLogin(String login);
+
+    void changePassword(String id, ChangePasswordDTO dto);
 }

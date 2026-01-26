@@ -1,7 +1,9 @@
 package com.example.mappers;
 
-import com.example.domain.*;
-import com.example.model.users.Role;
+import com.example.domain.Admin;
+import com.example.domain.Client;
+import com.example.domain.Moderator;
+import com.example.domain.User;
 import com.example.model.users.*;
 import org.springframework.stereotype.Component;
 
@@ -86,5 +88,18 @@ public class UserMapper {
         admin.setRole(Role.ADMIN);
         admin.setIsActive(dto.getIsActive());
         return admin;
+    }
+
+    public void updateUserFromDto(UpdateUserDTO dto, User user) {
+        if (dto.getFirstName() != null) {
+            user.setFirstName(dto.getFirstName());
+        }
+        if (dto.getLastName() != null) {
+            user.setLastName(dto.getLastName());
+        }
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
+
     }
 }

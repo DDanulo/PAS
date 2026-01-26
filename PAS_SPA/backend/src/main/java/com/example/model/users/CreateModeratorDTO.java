@@ -17,6 +17,10 @@ public class CreateModeratorDTO {
     private String login;
 
     @NotNull
+    @Size(min = 8)
+    private String password;
+
+    @NotNull
     @Size(min = 3, max = 30)
     private String firstName;
 
