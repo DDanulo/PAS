@@ -26,7 +26,6 @@ export default function UserForm() {
         resolver: yupResolver(schema),
         context: {isEdit}
     });
-
     useEffect(() => {
         if (isEdit) {
             axiosSetup.get(`/users/${id}`).then(res => {

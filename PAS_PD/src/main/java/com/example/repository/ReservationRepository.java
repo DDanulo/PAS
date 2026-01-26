@@ -53,9 +53,10 @@ public class ReservationRepository extends AbstractMongoRepository implements IR
         Bson updateUser = Updates.set("client", obj.getClient());
         Bson updateStartTime = Updates.set("start_time", obj.getStartTime());
         Bson updateEndTime = Updates.set("end_time", obj.getEndTime());
+        Bson updatePrice = Updates.set("price", obj.getPrice());
 
         reservations.updateOne(session, Filters.eq("_id", id), Updates.combine(updateUser, updateRoom,
-                updateStartTime, updateEndTime));
+                updateStartTime, updateEndTime, updatePrice));
     }
 
     public List<Reservation> findByClient(ObjectId clientId) {

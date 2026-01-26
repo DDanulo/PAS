@@ -3,7 +3,7 @@ package com.example.controller.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Reservation has ended.")
+@ResponseStatus(value = HttpStatus.CONFLICT, reason = "Reservation has ended.")
 public class ReservationHasEndedException extends RuntimeException {
     public ReservationHasEndedException() {
     }

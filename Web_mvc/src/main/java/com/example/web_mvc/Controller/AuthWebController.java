@@ -36,7 +36,7 @@ public class AuthWebController {
             }
 
         } catch (HttpClientErrorException.NotFound e) {
-            model.addAttribute("error", "Nie znaleziono użytkownika o takim loginie.");
+            model.addAttribute("error", "Nie znaleziono użytkownika z takim loginem");
         } catch (Exception e) {
             model.addAttribute("error", "Błąd serwera: " + e.getMessage());
         }

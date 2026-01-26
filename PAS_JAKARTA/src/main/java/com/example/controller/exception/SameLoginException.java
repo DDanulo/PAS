@@ -1,5 +1,6 @@
 package com.example.controller.exception;
 
+
 public class SameLoginException extends RuntimeException {
     public SameLoginException(String message) {
         super(message);

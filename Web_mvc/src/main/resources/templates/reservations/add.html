@@ -7,26 +7,32 @@
 </head>
 <body>
 
-    <h1>Reserve room</h1>
-
-    <form th:action="@{/reservations/add}" th:object="${reservation}" method="post">
+<h1>Reserve room</h1>
+<p th:text="${error}"></p>
+<form th:action="@{/reservations/add}" th:object="${reservation}" method="post">
+    <div>
+        <label>Początek rezerwacji</label>
         <input type="datetime-local" th:field="*{startTime}" required/>
-        <input type="number" th:field="*{price}" required/>
-        <div>
-            <label>Choose room:</label>
-            <select th:field="*{roomId}" required>
-                <option value="" disabled selected>-- click to choose the room --</option>
+    </div>
+<!--    <div>-->
+<!--        <label>Cena:</label>-->
+<!--        <input type="number" th:field="*{price}" required/>-->
+<!--    </div>-->
+    <div>
+        <label>Wybierz pokój:</label>
+        <select th:field="*{roomId}" required>
+            <option th:each="room : ${rooms}"
+                    th:value="${room.id}"
+                    th:text="${room.roomType} + '(Miejsc: ' + ${room.capacity} + ')'">
+            </option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Zarezerwuj</button>
+    </div>
 
-                <option th:each="room : ${rooms}"
-                        th:value="${room.id}"
-                        th:text="${room.roomType} + '(Miejsc: ' + ${room.capacity} + ')'">
-                </option>
-            </select>
-        </div>
-        <button type="submit">Reserve</button>
-
-    </form>
-    <a th:href="@{/reservations}">Cancel</a>
+</form>
+<a th:href="@{/reservations}">Anuluj</a>
 
 </body>
 </html>

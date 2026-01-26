@@ -23,7 +23,7 @@ public class CreateReservationDTO {
     private LocalDateTime startTime;
 
 
-    @NotNull
+//    @NotNull
     @DecimalMin("0.0")
     private Double price;
 

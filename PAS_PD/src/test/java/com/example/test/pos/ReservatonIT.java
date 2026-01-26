@@ -139,7 +139,7 @@ public class ReservatonIT {
                 .when()
                 .post("/reservations")
                 .then()
-                .statusCode(500);
+                .statusCode(409);
     }
 
 }

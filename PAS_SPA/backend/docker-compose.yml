@@ -2,7 +2,7 @@ services:
   mongo_1:
     build: .
     image: mongocustom:8.0.1
-    container_name: mongodb1
+    container_name: mongodb1_PAS
     hostname: mongodb1
     networks:
       - mongonet
@@ -24,7 +24,7 @@ services:
   mongo_2:
     build: .
     image: mongocustom:8.0.1
-    container_name: mongodb2
+    container_name: mongodb2_PAS
     hostname: mongodb2
     networks:
       - mongonet
@@ -46,7 +46,7 @@ services:
   mongo_3:
     build: .
     image: mongocustom:8.0.1
-    container_name: mongodb3
+    container_name: mongodb3_PAS
     hostname: mongodb3
     networks:
       - mongonet
@@ -69,7 +69,7 @@ services:
     build: .
     image: mongocustom:8.0.1
     hostname: mongodbinit
-    container_name: mongodbinit
+    container_name: mongodbinit_PAS
     networks:
       - mongonet
     depends_on:

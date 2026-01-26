@@ -30,6 +30,11 @@ public class ClientWebController {
         return "/user/registration";
     }
 
+    @GetMapping("/")
+    public String redirectToLogin() {
+        return "redirect:/login";
+    }
+
     @PostMapping("/register")
     public String registerClient(
             @ModelAttribute("client") @Valid CreateClientDTO dto,
