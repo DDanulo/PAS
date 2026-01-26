@@ -6,9 +6,14 @@ import com.example.model.ShowReservationDTO;
 import com.example.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
@@ -22,13 +27,18 @@ public class ReservationController {
     }
 
     @GetMapping("/{id}")
-    public ShowReservationDTO getReservationById(@PathVariable String id){
-        return (reservationService.findReservation(id).orElseThrow(NotFoundException::new));
+    public ShowReservationDTO getReservationById(@PathVariable String id) {
+        ShowReservationDTO dto = reservationService.findReservation(id)
+                .orElseThrow(NotFoundException::new);
+
+        return addHateoasLinks(dto);
     }
 
     @GetMapping
-    public List<ShowReservationDTO> getAllReservations(){
-        return reservationService.getAllReservations();
+    public List<ShowReservationDTO> getAllReservations() {
+        return reservationService.getAllReservations().stream()
+                .map(this::addHateoasLinks)
+                .toList();
     }
 
     @PutMapping("/{id}")
@@ -38,8 +48,9 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReservation(@PathVariable String id){
+    public ResponseEntity<Void> deleteReservation(@PathVariable String id){
         reservationService.removeReservation(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/clients/{clientId}/reservations")
@@ -67,7 +78,24 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/end")
-    public void endReservation(@PathVariable String id){
+    public ResponseEntity<Void> endReservation(@PathVariable String id){
         reservationService.endReservation(id);
+        return ResponseEntity.ok().build();
     }
+
+    private ShowReservationDTO addHateoasLinks(ShowReservationDTO dto) {
+        String id = dto.getReservationId();
+
+        dto.removeLinks();
+
+        dto.add(linkTo(methodOn(ReservationController.class).getReservationById(id)).withSelfRel());
+        dto.add(linkTo(methodOn(ReservationController.class).endReservation(id)).withRel("cancel"));
+        dto.add(linkTo(methodOn(ReservationController.class).deleteReservation(id)).withRel("delete"));
+
+        dto.add(linkTo(methodOn(UserController.class).getClientById(dto.getClientId())).withRel("user"));
+        dto.add(linkTo(methodOn(RoomController.class).getRoomById(dto.getRoomId())).withRel("resource"));
+
+        return dto;
+    }
+
 }
