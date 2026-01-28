@@ -131,6 +131,15 @@ public class ReservationServiceMongo implements ReservationService {
     }
 
     @Override
+    public List<ShowReservationDTO> findAllForClient(String clientId) {
+        ObjectId objectId = new ObjectId(clientId);
+        return repository.findByClient(objectId)
+                .stream()
+                .map(reservationMapper::reservationToShowReservationDTO)
+                .toList();
+    }
+
+    @Override
     public List<ShowReservationDTO> findCurrentForRoom(String roomId) {
         ObjectId objectId = new ObjectId(roomId);
         return repository.findByRoom(objectId)

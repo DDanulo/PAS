@@ -20,6 +20,7 @@ public interface ReservationService {
     List<ShowReservationDTO> findCurrentForClient(String clientId);
 
     List<ShowReservationDTO> findPastForClient(String clientId);
+    List<ShowReservationDTO> findAllForClient(String clientId);
 
     List<ShowReservationDTO> findCurrentForRoom(String roomId);
 

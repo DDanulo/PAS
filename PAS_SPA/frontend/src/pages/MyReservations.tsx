@@ -3,32 +3,34 @@ import axiosSetup from '../api/axiosSetup.ts';
 import {Link} from 'react-router-dom';
 import {toast} from 'react-toastify';
 
-export default function ReservationList() {
+export default function MyReservationList() {
     const [reservations, setReservations] = useState([]);
-    const [clients, setClients] = useState<any[]>([]);
+    const [client, setClient] = useState({
+        firstName: "",
+        lastName: "",
+        login: ""
+    });
     const [rooms, setRooms] = useState<any[]>([]);
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const loadData = async () => {
         try {
             const [resRes, resClients, resRooms] = await Promise.all([
-                axiosSetup.get('/reservations'),
-                axiosSetup.get('/users'),
+                axiosSetup.get('/me/reservations'),
+                axiosSetup.get('/me'),
                 axiosSetup.get('/rooms')
             ]);
             setReservations(resRes.data);
-            setClients(resClients.data);
+            setClient(resClients.data);
             setRooms(resRooms.data);
         } catch (e) {
             console.error(e);
             toast.error("Błąd podczas pobierania rezerwacji");
         }
     };
-
-    useEffect(() => {
-        loadData();
-    }, []);
-
-
 
     const formatDate = (dateVal: any) => {
         if (!dateVal) return "";
@@ -55,7 +57,6 @@ export default function ReservationList() {
     };
 
     const getClientName = (id: string) => {
-        const client = clients.find((c: any) => c.id === id);
         return client ? `${client.firstName} ${client.lastName} (${client.login})` : id;
     };
 

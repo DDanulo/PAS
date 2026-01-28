@@ -17,13 +17,29 @@ interface AuthContextType {
     logout: () => void;
 }
 
+const getInitialData = () => {
+    const token = sessionStorage.getItem("jwt_token");
+    if (token && token !== "undefined" && token !== "null") {
+        try {
+            const decoded = jwtDecode<JwtPayload>(token);
+            return { role: decoded.role, login: decoded.sub };
+        } catch {
+            return { role: null, login: null };
+        }
+    }
+    return { role: null, login: null };
+};
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({children}: { children: ReactNode }) => {
+    const initialState = getInitialData();
+
     const [token, setToken] = useState<string | null>(sessionStorage.getItem("jwt_token"));
     const [refreshToken, setRefreshToken] = useState<string | null>(sessionStorage.getItem("refresh_token"));
-    const [userRole, setUserRole] = useState<string | null>(null);
-    const [userLogin, setUserLogin] = useState<string | null>(null);
+
+    const [userRole, setUserRole] = useState<string | null>(initialState.role);
+    const [userLogin, setUserLogin] = useState<string | null>(initialState.login);
 
     const setTokens = (accessToken: string | null, rToken: string | null) => {
         if (accessToken) {

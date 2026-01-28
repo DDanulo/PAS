@@ -4,6 +4,7 @@ import com.example.controller.exception.NotFoundException;
 import com.example.model.CreateRoomDTO;
 import com.example.model.ShowRoomDTO;
 import com.example.service.RoomService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -23,6 +24,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping(BASE_URL)
+    @RolesAllowed("ADMIN")
     public ShowRoomDTO createRoom(@RequestBody @Valid CreateRoomDTO roomDTO){
         return roomService.addRoom(roomDTO);
     }
@@ -38,12 +40,14 @@ public class RoomController {
     }
 
     @PutMapping(BASE_ID_URL)
+    @RolesAllowed("ADMIN")
     public ShowRoomDTO updateRoom(@PathVariable String id,
                            @RequestBody @Valid CreateRoomDTO roomDTO){
         return roomService.updateRoom(id, roomDTO);
     }
 
     @DeleteMapping(BASE_ID_URL)
+    @RolesAllowed("ADMIN")
     public void deleteRoom(@PathVariable String id){
         roomService.removeRoom(id);
     }

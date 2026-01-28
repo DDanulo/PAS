@@ -6,6 +6,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import axiosSetup from '../api/axiosSetup.ts';
 import {toast} from 'react-toastify';
 import {useAuth} from '../context/LoggedUserContext';
+import {RoleEnum} from "../HandleProtection.tsx";
 
 const userSchema = yup.object({
     login: yup.string().required('Login wymagany'),
@@ -27,7 +28,7 @@ const passwordSchema = yup.object({
 export default function UserEditForm() {
     const {id} = useParams();
     const navigate = useNavigate();
-    const {userLogin} = useAuth();
+    const {userLogin, userRole} = useAuth();
 
     const [etag, setEtag] = useState<string | null>(null);
 
@@ -51,10 +52,25 @@ export default function UserEditForm() {
 
     useEffect(() => {
         if (id) {
-            axiosSetup.get(`/users/${id}`).then(res => {
+            axiosSetup.get(`/users/id/${id}`).then(res => {
+                const u = res.data;
+                setValueData('login', userLogin);
+                setValueData('firstName', u.firstName);
+                setValueData('lastName', u.lastName);
+                setValueData('email', u.email);
+
+                if (res.headers['etag']) {
+                    setEtag(res.headers['etag']);
+                }
+            }).catch(() => {
+                toast.error("Nie udało się pobrać danych użytkownika");
+                navigate('/users');
+            });
+        } else {
+            axiosSetup.get(`/me`).then(res => {
                 const u = res.data;
 
-                setValueData('login', u.login);
+                setValueData('login', userLogin);
                 setValueData('firstName', u.firstName);
                 setValueData('lastName', u.lastName);
                 setValueData('email', u.email);
@@ -65,10 +81,11 @@ export default function UserEditForm() {
 
             }).catch(() => {
                 toast.error("Nie udało się pobrać danych użytkownika");
-                navigate('/users');
+                navigate('/me');
             });
         }
-    }, [id, setValueData, navigate]);
+
+    }, [id, setValueData, navigate, userLogin]);
 
     const onSubmitData = async (data: any) => {
         if (!window.confirm("Zapisać zmiany?")) return;
@@ -79,13 +96,21 @@ export default function UserEditForm() {
         };
 
         try {
-            await axiosSetup.put(`/users/${id}`, payload, {
-                headers: {
-                    'If-Match': etag
-                }
-            });
-            toast.success("Zaktualizowano dane użytkownika");
-
+            if (userRole === RoleEnum.ADMIN) {
+                await axiosSetup.put(`/users/${id}`, payload, {
+                    headers: {
+                        'If-Match': etag
+                    }
+                });
+                toast.success("Zaktualizowano dane użytkownika");
+            } else {
+                await axiosSetup.put(`/me`, payload, {
+                    headers: {
+                        'If-Match': etag
+                    }
+                });
+                toast.success("Twoje dane zostały zaktualizowane");
+            }
         } catch (e: any) {
             const msg = e.response?.data?.message || "Wystąpił błąd podczas edycji";
             toast.error(msg);
@@ -93,23 +118,28 @@ export default function UserEditForm() {
     };
 
     const onSubmitPassword = async (data: any) => {
-        if (!window.confirm("Czy na pewno chcesz zmienić hasło?")) return;
+            if (!window.confirm("Czy na pewno chcesz zmienić hasło?")) return;
 
-        const payload = {
-            oldPassword: data.oldPassword,
-            newPassword: data.newPassword
-        };
+            const payload = {
+                oldPassword: data.oldPassword,
+                newPassword: data.newPassword
+            };
 
-        try {
-            await axiosSetup.patch(`/users/${id}/password`, payload);
-
-            toast.success("Hasło zostało zmienione");
-            resetPass();
-        } catch (e: any) {
-            const msg = e.response?.data?.message || "Błąd zmiany hasła (sprawdź stare hasło)";
-            toast.error(msg);
+            try {
+                if (userRole === RoleEnum.ADMIN) {
+                    await axiosSetup.patch(`/users/${id}/password`, payload);
+                }else{
+                    await axiosSetup.patch(`/me/password`, payload);
+                }
+                toast.success("Hasło zostało zmienione");
+                resetPass();
+            } catch
+                (e: any) {
+                const msg = e.response?.data?.message || "Błąd zmiany hasła (sprawdź stare hasło)";
+                toast.error(msg);
+            }
         }
-    };
+    ;
 
     return (
         <div className="container">

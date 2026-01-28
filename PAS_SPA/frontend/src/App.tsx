@@ -6,12 +6,14 @@ import AuthProvider, {useAuth} from './context/LoggedUserContext';
 import ProtectedRoute, {RoleEnum} from './HandleProtection';
 
 import UserList from './pages/UserList';
+import UserMe from './pages/UserMe';
 import UserCreateForm from './pages/UserCreateForm';
 import UserDetails from './pages/UserDetails';
 import UserEditForm from "./pages/UserEditForm";
 import ReservationList from './pages/ReservationList';
 import ReservationForm from './pages/ReservationForm';
 import LoginForm from './pages/LoginForm';
+import MyReservationList from "./pages/MyReservations.tsx";
 
 const Bar = () => {
     const {isAuthenticated, logout, userLogin, userRole} = useAuth();
@@ -23,12 +25,16 @@ const Bar = () => {
             <div className="navbar-menu">
                 {isAuthenticated ? (
                     <>
-                        <div className="navbar-links">
-                            <Link to="/users" className="nav-link">
-                                {userRole === RoleEnum.ADMIN ? "Zarządzaj klientami" : "Moje konto"}
-                            </Link>
-                            <Link to="/reservations" className="nav-link">Rezerwacje</Link>
-                        </div>
+                        {userRole === RoleEnum.ADMIN ?
+                            <div className="navbar-links">
+                                <Link to="/users" className="nav-link">Zarządzaj użytkownikami</Link>
+                                <Link to="/reservations" className="nav-link">Rezerwacje</Link>
+                            </div> :
+                            <div className="navbar-links">
+                                <Link to="/me" className="nav-link">Moje konto</Link>
+                                <Link to="/me/reservations" className="nav-link">Moje rezerwacje</Link>
+                            </div>
+                        }
 
                         <div className="navbar-user">
                             <span className="user-label">
@@ -59,8 +65,23 @@ function App() {
                             <Route path="/login" element={<LoginForm/>}/>
 
                             <Route path="/users" element={
-                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN, RoleEnum.CLIENT]}>
+                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN]}>
                                     <UserList/>
+                                </ProtectedRoute>
+                            }/>
+                            <Route path="/me" element={
+                                <ProtectedRoute allowedRoles={[RoleEnum.CLIENT, RoleEnum.ADMIN]}>
+                                    <UserMe/>
+                                </ProtectedRoute>
+                            }/>
+                            <Route path="/me/edit" element={
+                                <ProtectedRoute allowedRoles={[RoleEnum.CLIENT, RoleEnum.ADMIN]}>
+                                    <UserEditForm/>
+                                </ProtectedRoute>
+                            }/>
+                            <Route path="/me/reservations" element={
+                                <ProtectedRoute allowedRoles={[RoleEnum.CLIENT, RoleEnum.ADMIN]}>
+                                    <MyReservationList/>
                                 </ProtectedRoute>
                             }/>
 
@@ -71,19 +92,25 @@ function App() {
                             }/>
 
                             <Route path="/users/edit/:id" element={
-                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN, RoleEnum.CLIENT]}>
+                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN]}>
                                     <UserEditForm/>
                                 </ProtectedRoute>
                             }/>
 
                             <Route path="/users/:id" element={
+                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN]}>
+                                    <UserDetails/>
+                                </ProtectedRoute>
+                            }/>
+
+                            <Route path="/me/details" element={
                                 <ProtectedRoute allowedRoles={[RoleEnum.ADMIN, RoleEnum.CLIENT]}>
                                     <UserDetails/>
                                 </ProtectedRoute>
                             }/>
 
                             <Route path="/reservations" element={
-                                <ProtectedRoute>
+                                <ProtectedRoute allowedRoles={[RoleEnum.ADMIN]}>
                                     <ReservationList/>
                                 </ProtectedRoute>
                             }/>

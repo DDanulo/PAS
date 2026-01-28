@@ -1,16 +1,25 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {useAuth} from '../context/LoggedUserContext';
+import {RoleEnum} from "../HandleProtection.tsx";
 
 const LoginForm = () => {
-    const {setTokens} = useAuth();
+    const {setTokens, isAuthenticated, userRole} = useAuth();
     const navigate = useNavigate();
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
+    useEffect(() => {
+        if (isAuthenticated && userRole) {
+            if (userRole === RoleEnum.ADMIN) {
+                navigate('/users');
+            } else {
+                navigate('/me');
+            }
+        }
+    }, [isAuthenticated, userRole, navigate]);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -24,8 +33,6 @@ const LoginForm = () => {
             const {accessToken, refreshToken} = response.data;
 
             setTokens(accessToken, refreshToken);
-
-            navigate('/users');
         } catch (err: any) {
             console.error("Login Error:", err);
 

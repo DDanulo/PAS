@@ -4,6 +4,7 @@ import com.example.controller.exception.NotFoundException;
 import com.example.model.CreateReservationDTO;
 import com.example.model.ShowReservationDTO;
 import com.example.service.ReservationService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class ReservationController {
     }
 
     @GetMapping("/{id}")
+    @RolesAllowed("ADMIN")
     public ShowReservationDTO getReservationById(@PathVariable String id) {
         ShowReservationDTO dto = reservationService.findReservation(id)
                 .orElseThrow(NotFoundException::new);
@@ -42,6 +44,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
+    @RolesAllowed("ADMIN")
     public void updateReservation(@PathVariable String id,
                              @RequestBody @Valid CreateReservationDTO reservationDTO){
         reservationService.updateReservation(id, reservationDTO);
@@ -54,6 +57,7 @@ public class ReservationController {
     }
 
     @GetMapping("/clients/{clientId}/reservations")
+    @RolesAllowed("ADMIN")
     public List<ShowReservationDTO> getClientReservation(
             @PathVariable String clientId,
             @RequestParam(required = false, defaultValue = "current") String status) {
@@ -66,6 +70,7 @@ public class ReservationController {
     }
 
     @GetMapping("/rooms/{roomId}/reservations")
+    @RolesAllowed("ADMIN")
     public List<ShowReservationDTO> getRoomReservation(
             @PathVariable String roomId,
             @RequestParam(required = false, defaultValue = "current") String status) {
@@ -78,6 +83,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/end")
+    @RolesAllowed("ADMIN")
     public ResponseEntity<Void> endReservation(@PathVariable String id){
         reservationService.endReservation(id);
         return ResponseEntity.ok().build();

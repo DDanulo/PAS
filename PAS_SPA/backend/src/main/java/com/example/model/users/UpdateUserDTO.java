@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
 public class UpdateUserDTO {
 
     @NotNull
+    @Size(min = 5, max = 30)
+    private String login;
+
+    @NotNull
     @Size(min = 3, max = 30)
     private String firstName;
 

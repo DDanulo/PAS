@@ -49,7 +49,7 @@ public abstract class User {
     private String email;
 
     @NotNull
-    @BsonProperty("is_active")
+    @BsonProperty("active")
     private Boolean isActive;
 
     @NotNull

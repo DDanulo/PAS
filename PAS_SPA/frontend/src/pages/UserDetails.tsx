@@ -2,30 +2,38 @@ import {useEffect, useState} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import axiosSetup from '../api/axiosSetup.ts';
 import {toast} from 'react-toastify';
+import {useAuth} from "../context/LoggedUserContext.tsx";
+import {RoleEnum} from "../HandleProtection.tsx";
 
 export default function UserDetails() {
     const {id} = useParams();
     const navigate = useNavigate();
-
-    const [user, setUser] = useState<any>(null);
-    const [reservations, setReservations] = useState<any[]>([]);
-    const [rooms, setRooms] = useState<any[]>([]);
+    const {userRole}= useAuth();
+    const [user, setUser] = useState(null);
+    const [reservations, setReservations] = useState([]);
+    const [rooms, setRooms] = useState([]);
     const [tab, setTab] = useState<'active' | 'history'>('active');
-
     useEffect(() => {
         loadData();
     }, [id]);
 
     const loadData = async () => {
         try {
-            const userRes = await axiosSetup.get(`/users/${id}`);
+            let userRes;
+            let userReservations;
+            if (userRole === RoleEnum.CLIENT){
+                userRes = await axiosSetup.get(`/me`);
+                userReservations = await axiosSetup.get('/me/reservations');
+            }else {
+                userRes = await axiosSetup.get(`/users/id/${id}`);
+                userReservations = await axiosSetup.get('/reservations');
+                userReservations = userReservations.data.filter((r: any) =>
+                    r.clientId === id || r.userId === id
+                );
+            }
             setUser(userRes.data);
 
-            const currentRes = await axiosSetup.get('/reservations');
-            const userReservations = currentRes.data.filter((r: any) =>
-                r.clientId === id || r.userId === id
-            );
-            setReservations(userReservations);
+            setReservations(userReservations.data);
 
             const roomInRes = await axiosSetup.get('/rooms');
             setRooms(roomInRes.data);
@@ -90,7 +98,7 @@ export default function UserDetails() {
                 <tbody>
                 {displayedReservations.length > 0 ? (
                     displayedReservations.map((res: any) => (
-                        <tr key={res.id || res._id}>
+                        <tr key={res.id}>
                             <td>{getRoomName(res.roomId)}</td>
 
                             <td>{formatDate(res.startTime)}</td>
@@ -102,7 +110,7 @@ export default function UserDetails() {
                         </tr>
                     ))
                 ) : (
-                    <tr>
+                    <tr key={"null"}>
                         <td colSpan={4}>
                             Brak dostępnych rezerwacji
                         </td>

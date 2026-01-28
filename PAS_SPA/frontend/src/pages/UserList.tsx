@@ -87,21 +87,23 @@ export default function UserList() {
                                 {user.isActive ? 'AKTYWNY' : 'ZABLOKOWANY'}
                             </td>
                             <td className="actions-cell">
-                                <Link to={`/users/${user.id}`} className="link-details">
+
+                                <Link to={`/users/${user.id}`}className="link-details">
                                     Szczegóły
                                 </Link>
+
                                 <Link to={`/users/edit/${user.id}`} className="link-edit">
                                     Edytuj
                                 </Link>
 
-                                {userRole === RoleEnum.ADMIN && (
-                                    <button
-                                        className={`btn-small ${user.isActive ? 'btn-danger' : 'btn-success'}`}
-                                        onClick={() => toggleStatus(user.id!, user.isActive)}
-                                    >
-                                        {user.isActive ? 'Zablokuj' : 'Aktywuj'}
-                                    </button>
-                                )}
+                                {/*{userRole === RoleEnum.ADMIN && (*/}
+                                <button
+                                    className={`btn-small ${user.isActive ? 'btn-danger' : 'btn-success'}`}
+                                    onClick={() => toggleStatus(user.id!, user.isActive)}
+                                >
+                                    {user.isActive ? 'Zablokuj' : 'Aktywuj'}
+                                </button>
+                                {/*)}*/}
                             </td>
                         </tr>
                     ))

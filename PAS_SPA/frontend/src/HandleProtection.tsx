@@ -22,10 +22,15 @@ const ProtectedRoute = ({ children, allowedRoles }: HandleProtectionProperties) 
     const hasPermission = !allowedRoles || allowedRoles.includes(userRole as RoleEnum);
 
     if (!hasPermission) {
-        return <Navigate to="/users" replace />;
+        console.log("Access Denied. User Role:", userRole, "Allowed:", allowedRoles);
+        if (userRole === RoleEnum.ADMIN) {
+            return <Navigate to="/reservations" replace/>;
+        }else{
+            return <Navigate to="/me/reservations" replace/>;
+        }
     }
 
-    return children;
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;

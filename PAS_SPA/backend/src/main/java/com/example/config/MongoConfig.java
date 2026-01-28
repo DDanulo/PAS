@@ -1,6 +1,7 @@
 package com.example.config;
 
 import com.example.domain.*;
+import com.example.model.users.Role;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
@@ -16,6 +17,7 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -68,6 +70,15 @@ public class MongoConfig {
     public void ensureIndexesAndDrop() {
         MongoCollection<User> users = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("users", User.class);
         users.drop();
+        User admin = new Admin();
+        admin.setLogin("admin");
+        admin.setPassword("$2a$12$ZZ3Ug4gOcDYeIJN7P12EJenkl1fe30JMg3jtqK5hBoEJvEg1e9vlC");
+        admin.setEmail("admin@admin.com");
+        admin.setRole(Role.ADMIN);
+        admin.setFirstName("admin");
+        admin.setLastName("admin");
+        admin.setIsActive(true);
+        users.insertOne(admin);
         MongoCollection<Reservation> reservations = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("reservations", Reservation.class);
         reservations.drop();
         MongoCollection<Room> rooms = rentAFieldDB(mongoClient(pojoCodecRegistry())).getCollection("rooms", Room.class);

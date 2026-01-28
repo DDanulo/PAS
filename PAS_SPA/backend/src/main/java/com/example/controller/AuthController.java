@@ -24,7 +24,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO credentials) {
         User user = userService.findByLogin(credentials.getLogin());
-
         if (user == null) {
             return ResponseEntity.status(401).body("Błędne hasło lub login");
         }
