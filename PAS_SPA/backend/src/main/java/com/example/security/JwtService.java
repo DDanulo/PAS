@@ -82,4 +82,25 @@ public class JwtService {
         byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public String signData(String data) {
+        return Jwts.builder()
+                .setSubject(data)
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean verifySignature(String data, String signature) {
+        try {
+            String signedData = Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(signature)
+                    .getBody()
+                    .getSubject();
+            return data.equals(signedData);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

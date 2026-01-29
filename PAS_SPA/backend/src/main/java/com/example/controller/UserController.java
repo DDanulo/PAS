@@ -3,10 +3,13 @@ package com.example.controller;
 import com.example.controller.exception.NotFoundException;
 import com.example.model.ChangePasswordDTO;
 import com.example.model.users.*;
+import com.example.security.JwtService;
 import com.example.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +24,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     private final UserService userService;
-
+    private final JwtService jwtService;
     @RolesAllowed("ADMIN")
     @GetMapping
     public List<ShowUserDTO> getAllClients() {
@@ -48,15 +51,23 @@ public class UserController {
 
     @GetMapping("/id/{id}")
     @RolesAllowed("ADMIN")
-    public ShowUserDTO getClientById(@PathVariable String id) {
-        return userService.findUser(id).orElseThrow(NotFoundException::new);
+    public ResponseEntity<ShowUserDTO> getClientById(@PathVariable String id) {
+        ShowUserDTO userDTO = userService.findUser(id).orElseThrow(NotFoundException::new);
+        String signature = jwtService.signData(userDTO.getLogin());
+        return ResponseEntity.ok().eTag(signature).body(userDTO);
     }
 
     @PutMapping("/{id}")
     @RolesAllowed("ADMIN")
-    public void updateClient(@PathVariable String id,
+    public ResponseEntity<Void> updateClient(@PathVariable String id,
+                             @RequestHeader(value = "If-Match") String signature,
                              @RequestBody @Valid UpdateUserDTO userDTO) {
+        String cleanSignature = signature.replace("\"", "");
+        if (!jwtService.verifySignature(userDTO.getLogin(), cleanSignature)){
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
         userService.updateClient(id, userDTO);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/by-login/{login}")

@@ -5,10 +5,12 @@ import com.example.model.ChangePasswordDTO;
 import com.example.model.ShowReservationDTO;
 import com.example.model.users.ShowUserDTO;
 import com.example.model.users.UpdateUserDTO;
+import com.example.security.JwtService;
 import com.example.service.ReservationService;
 import com.example.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,19 +29,28 @@ public class MeController {
 
     private final UserService userService;
     private final ReservationService reservationService;
+    private final JwtService jwtService;
 
     @GetMapping()
-    public ShowUserDTO getMe(@AuthenticationPrincipal String username) {
-        return userService.getClientByLogin(username).orElseThrow(NotFoundException::new);
+    public ResponseEntity<ShowUserDTO> getMe(@AuthenticationPrincipal String username) {
+        ShowUserDTO userDTO = userService.getClientByLogin(username).orElseThrow(NotFoundException::new);
+        String signature = jwtService.signData(userDTO.getLogin());
+        return ResponseEntity.ok().eTag(signature).body(userDTO);
     }
 
     @PutMapping()
-    public void updateClient(@AuthenticationPrincipal String username,
-                             @RequestBody @Valid UpdateUserDTO userDTO) {
+    public ResponseEntity<Void> updateClient(@AuthenticationPrincipal String username,
+                                               @RequestHeader(value = "If-Match") String signature,
+                                               @RequestBody @Valid UpdateUserDTO userDTO) {
+        String cleanSignature = signature.replace("\"", "");
+        if (!jwtService.verifySignature(userDTO.getLogin(), cleanSignature)){
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
         userService.getClientByLogin(username).ifPresentOrElse(
                 (u) -> userService.updateClient(u.getId(), userDTO),
                 NotFoundException::new
         );
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reservations")

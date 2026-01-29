@@ -59,9 +59,8 @@ export default function UserEditForm() {
                 setValueData('lastName', u.lastName);
                 setValueData('email', u.email);
 
-                if (res.headers['etag']) {
-                    setEtag(res.headers['etag']);
-                }
+                const etagHeader = res.headers['etag'];
+                setEtag(etagHeader);
             }).catch(() => {
                 toast.error("Nie udało się pobrać danych użytkownika");
                 navigate('/users');
@@ -75,10 +74,8 @@ export default function UserEditForm() {
                 setValueData('lastName', u.lastName);
                 setValueData('email', u.email);
 
-                if (res.headers['etag']) {
-                    setEtag(res.headers['etag']);
-                }
-
+                const etagHeader = res.headers['etag'];
+                setEtag(etagHeader);
             }).catch(() => {
                 toast.error("Nie udało się pobrać danych użytkownika");
                 navigate('/me');
