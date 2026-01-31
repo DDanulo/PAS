@@ -18,7 +18,7 @@ interface AuthContextType {
 }
 
 const getInitialData = () => {
-    const token = sessionStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("access_token");
     if (token && token !== "undefined" && token !== "null") {
         try {
             const decoded = jwtDecode<JwtPayload>(token);
@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({children}: { children: ReactNode }) => {
     const initialState = getInitialData();
 
-    const [token, setToken] = useState<string | null>(sessionStorage.getItem("jwt_token"));
+    const [token, setToken] = useState<string | null>(sessionStorage.getItem("access_token"));
     const [refreshToken, setRefreshToken] = useState<string | null>(sessionStorage.getItem("refresh_token"));
 
     const [userRole, setUserRole] = useState<string | null>(initialState.role);
@@ -43,7 +43,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
 
     const setTokens = (accessToken: string | null, rToken: string | null) => {
         if (accessToken) {
-            sessionStorage.setItem('jwt_token', accessToken);
+            sessionStorage.setItem('access_token', accessToken);
             setToken(accessToken);
         }
         if (rToken) {

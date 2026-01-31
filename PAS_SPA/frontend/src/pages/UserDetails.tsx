@@ -20,20 +20,25 @@ export default function UserDetails() {
     const loadData = async () => {
         try {
             let userRes;
-            let userReservations;
+            let reservationsData = [];
+
             if (userRole === RoleEnum.CLIENT){
                 userRes = await axiosSetup.get(`/me`);
-                userReservations = await axiosSetup.get('/me/reservations');
-            }else {
+                const reservationsRes = await axiosSetup.get('/me/reservations');
+                reservationsData = reservationsRes.data;
+            } else {
                 userRes = await axiosSetup.get(`/users/id/${id}`);
-                userReservations = await axiosSetup.get('/reservations');
-                userReservations = userReservations.data.filter((r: any) =>
-                    r.clientId === id || r.userId === id
-                );
-            }
-            setUser(userRes.data);
+                const reservationsRes = await axiosSetup.get('/reservations');
 
-            setReservations(userReservations.data);
+                if (reservationsRes.data && Array.isArray(reservationsRes.data)) {
+                    reservationsData = reservationsRes.data.filter((r: any) =>
+                        r.clientId === id || r.userId === id
+                    );
+                }
+            }
+
+            setUser(userRes.data);
+            setReservations(reservationsData);
 
             const roomInRes = await axiosSetup.get('/rooms');
             setRooms(roomInRes.data);

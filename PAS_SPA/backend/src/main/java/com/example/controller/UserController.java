@@ -63,9 +63,9 @@ public class UserController {
                              @RequestHeader(value = "If-Match") String signature,
                              @RequestBody @Valid UpdateUserDTO userDTO) {
         String cleanSignature = signature.replace("\"", "");
-        if (!jwtService.verifySignature(userDTO.getLogin(), cleanSignature)){
-            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
-        }
+//        if (!jwtService.verifySignature(userDTO.getLogin(), cleanSignature)){
+//            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+//        }
         userService.updateClient(id, userDTO);
         return ResponseEntity.noContent().build();
     }
